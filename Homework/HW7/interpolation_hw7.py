@@ -8,7 +8,7 @@ def driver():
 
     f = lambda x: 1/(1+(10*x)**2)
 
-    N = 25
+    N = 10
     ''' interval'''
     a = -1
     b = 1
@@ -18,8 +18,8 @@ def driver():
     
     ''' create equispaced interpolation nodes'''
     # xint = np.linspace(a,b,N+1)
-    # xint = np.array([(-1 + (i-1)*h) for i in range(1,N+2)])
-    xint = np.array([np.cos(((2*i)-1)*np.pi/(2*N)) for i in range(1,N+2)])
+    xint = np.array([(-1 + (i-1)*h) for i in range(1,N+2)])
+    # xint = np.array([np.cos(((2*i)-1)*np.pi/(2*N)) for i in range(1,N+2)])
     
     ''' create interpolation data'''
     yint = f(xint)
@@ -31,22 +31,13 @@ def driver():
     yeval_barycentric = np.zeros(Neval+1)
     yeval_dd = np.zeros(Neval+1)
   
-    '''Initialize and populate the first columns of the 
-     divided difference matrix. We will pass the x vector'''
-    y = np.zeros( (N+1, N+1) )
-     
-    for j in range(N+1):
-       y[j][0]  = yint[j]
 
-    y = dividedDiffTable(xint, y, N+1)
+
     ''' evaluate lagrange poly '''
     for kk in range(Neval+1):
        yeval_barycentric[kk] = barycentric(xeval[kk],xint,yint,N)
-       yeval_dd[kk] = evalDDpoly(xeval[kk],xint,y,N)
-          
 
     
-
 
     ''' create vector with exact values'''
     fex = f(xeval)
@@ -116,33 +107,6 @@ def barycentric(xeval,xint,yint,N):
   
     return(yeval)
   
-    
-
-
-''' create divided difference matrix'''
-def dividedDiffTable(x, y, n):
- 
-    for i in range(1, n):
-        for j in range(n - i):
-            y[j][i] = ((y[j][i - 1] - y[j + 1][i - 1]) /
-                                     (x[j] - x[i + j]));
-    return y;
-    
-def evalDDpoly(xval, xint,y,N):
-    ''' evaluate the polynomial terms'''
-    ptmp = np.zeros(N+1)
-    
-    ptmp[0] = 1.
-    for j in range(N):
-      ptmp[j+1] = ptmp[j]*(xval-xint[j])
-     
-    '''evaluate the divided difference polynomial'''
-    yeval = 0.
-    for j in range(N+1):
-       yeval = yeval + y[0][j]*ptmp[j]  
-
-    return yeval
-
      
 
 driver()        
